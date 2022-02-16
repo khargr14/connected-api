@@ -1,22 +1,32 @@
-import React, {useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-import './App.css';
+import "./App.css";
+
+const useFetch = url => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(async () => {
+    const response = await fetch(url);
+    const data = await response.json();
+    const [item] = data.results;
+    setData(item);
+    setLoading(false);
+  }, []);
+
+  return { data, loading };
+};
 
 export default () => {
   const [count, setCount] = useState(0);
-
-  //Similar to componecntDidMount and componentDidUpate:
-  useEffect(() => {
-    //Update the document title using the brower API
-    document.title = `You clicked ${count} times`;
- });
+  const { data, loading } = useFetch("https://api.randomuser.me/");
 
   return (
     <div>
-      <p>
-        <p>You Clicked {count} times</p>
-        <button onClick={() => setCount(count + 1)}>Click me</button>
-      </p>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+      {loading ? <div>...loading</div> : <div>{data.name.first}</div>}
     </div>
   );
 };
